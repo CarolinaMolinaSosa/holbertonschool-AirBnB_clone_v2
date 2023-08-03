@@ -229,46 +229,91 @@ class HBNBCommand(cmd.Cmd):
         print(count)
 
     def help_count(self):
-        """ help count"""
+        """ """
         print("Usage: count <class_name>")
 
-    def do_create(self, arg):
-        """ Create an object of any class with parameters"""
-        if not arg:
+    def do_update(self, args):
+        """ Updates a certain object with new info """
+        c_name = c_id = att_name = att_val = kwargs = ''
+
+        # isolate cls from id/args, ex: (<cls>, delim, <id/args>)
+        args = args.partition(" ")
+        if args[0]:
+            c_name = args[0]
+        else:  # class name not present
             print("** class name missing **")
             return
-
-        parts = arg.split()
-        class_name = parts[0]
-
-        if class_name not in HBNBCommand.classes:
+        if c_name not in HBNBCommand.classes:  # class name invalid
             print("** class doesn't exist **")
             return
 
-        param_args = parts[1:]
-        new_instance = HBNBCommand.classes[class_name]()
+        # isolate id from args
+        args = args[2].partition(" ")
+        if args[0]:
+            c_id = args[0]
+        else:  # id not present
+            print("** instance id missing **")
+            return
 
-        for param_arg in param_args:
-            key_val = param_arg.split('=')
-            if len(key_val) != 2:
-                print(f"Skipping invalid parameter: {param_arg}")
-                continue
-            
-            key, val = key_val
-            if key in new_instance.__dict__:
-                val = val.replace('"', '').replace('_', ' ')
+        # generate key from class and id
+        key = c_name + "." + c_id
 
-                if key in HBNBCommand.types:
-                    try:
-                        val = HBNBCommand.types[key](val)
-                    except ValueError:
-                        print(f"Skipping invalid value for '{key}': {val}")
-                        continue
+        # determine if key is present
+        if key not in storage.all():
+            print("** no instance found **")
+            return
 
-                setattr(new_instance, key, val)
+        # first determine if kwargs or args
+        if '{' in args[2] and '}' in args[2] and type(eval(args[2])) is dict:
+            kwargs = eval(args[2])
+            args = []  # reformat kwargs into list, ex: [<name>, <value>, ...]
+            for k, v in kwargs.items():
+                args.append(k)
+                args.append(v)
+        else:  # isolate args
+            args = args[2]
+            if args and args[0] is '\"':  # check for quoted arg
+                second_quote = args.find('\"', 1)
+                att_name = args[1:second_quote]
+                args = args[second_quote + 1:]
 
-        storage.save()
-        print(new_instance.id)
+            args = args.partition(' ')
+
+            # if att_name was not quoted arg
+            if not att_name and args[0] is not ' ':
+                att_name = args[0]
+            # check for quoted val arg
+            if args[2] and args[2][0] is '\"':
+                att_val = args[2][1:args[2].find('\"', 1)]
+
+            # if att_val was not quoted arg
+            if not att_val and args[2]:
+                att_val = args[2].partition(' ')[0]
+
+            args = [att_name, att_val]
+
+        # retrieve dictionary of current objects
+        new_dict = storage.all()[key]
+
+        # iterate through attr names and values
+        for i, att_name in enumerate(args):
+            # block only runs on even iterations
+            if (i % 2 == 0):
+                att_val = args[i + 1]  # following item is value
+                if not att_name:  # check for att_name
+                    print("** attribute name missing **")
+                    return
+                if not att_val:  # check for att_value
+                    print("** value missing **")
+                    return
+                # type cast as necessary
+                if att_name in HBNBCommand.types:
+                    att_val = HBNBCommand.types[att_name](att_val)
+
+                # update dictionary with name, value pair
+                new_dict.__dict__.update({att_name: att_val})
+
+        new_dict.save()  # save updates to file
 
     def help_update(self):
         """ Help information for the update class """
