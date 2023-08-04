@@ -233,7 +233,7 @@ class HBNBCommand(cmd.Cmd):
         print("Usage: count <class_name>")
 
     def do_create(self, arg):
-    """ Create an object of any class with parameters"""
+        """ Create an object of any class with parameters"""
     if not arg:
         print("** class name missing **")
         return
