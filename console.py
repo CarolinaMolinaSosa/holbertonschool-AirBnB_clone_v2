@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] is '{' and pline[-1] is '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -187,7 +187,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del(storage.all()[key])
+            del storage.all()[key]
             storage.save()
         except KeyError:
             print("** no instance found **")
@@ -232,48 +232,44 @@ class HBNBCommand(cmd.Cmd):
         """ """
         print("Usage: count <class_name>")
 
-    def do_create(self, arg):
-        """ Create an object of any class with parameters"""
-    if not arg:
+    def do_create(self, args):
+        """Create an object of any class with given parameters"""
+    parts = args.split()
+
+    if not parts:
         print("** class name missing **")
         return
 
-    parts = arg.split()
     class_name = parts[0]
-
     if class_name not in HBNBCommand.classes:
         print("** class doesn't exist **")
         return
 
-    param_args = parts[1:]
     new_instance = HBNBCommand.classes[class_name]()
-    
-    for param_arg in param_args:
-        key_val = param_arg.split('=')
-        if len(key_val) != 2:
-            print(f"Skipping invalid parameter: {param_arg}")
-            continue
 
-        key, val = key_val
-        if key in new_instance.__dict__:
-            val = val.replace('"', '').replace('_', ' ')
+    for param in parts[1:]:
+        if "=" in param:
+            key, value = param.split("=")
 
-            if key in HBNBCommand.types:
-                try:
-                    val = HBNBCommand.types[key](val)
-                except ValueError:
-                    print(f"Skipping invalid value for '{key}': {val}")
-                    continue
+            if '"' in value:
+                value = value.replace('\\"', '"')
+                value = value.replace("_", " ")
+            elif "." in value:
+                value = float(value)
+            else:
+                value = int(value)
 
-            setattr(new_instance, key, val)
+            setattr(new_instance, key, value)
 
     storage.save()
     print(new_instance.id)
+    storage.save()
 
     def help_update(self):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
