@@ -133,9 +133,3 @@ class test_basemodel(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.updated_at), datetime.datetime)
-        n = new.to_dict()
-        new = BaseModel(**n)
-        self.assertFalse(new.created_at == new.updated_at)
