@@ -110,6 +110,8 @@ class test_Place(test_basemodel):
 
 if __name__ == "__main__":
     unittest.main()
+if __name__ == "__main__":
+    unittest.main()
         """ """
         new = self.value()
         self.assertEqual(type(new.amenity_ids), list)
