@@ -26,14 +26,11 @@ def c(text):
     return "C_{}".format(text).replace("_", " ")
 
 
-@app.route('/python/<text>', strict_slashes=False)
-def python(text="is cool"):
-    """
-    Display “Python ” followed by the value of the text variable
-    (replace underscore _ symbols with a space).
-    The default value of text is “is cool”.
-    """
-    return "Python {}".format(text.replace("_", " "))
+@app.route("/python", strict_slashes=False)
+@app.route("/python/<text>", strict_slashes=False)
+def python_HBNB(text="is cool"):
+    """starts a Flask web application and display 'python' + '<text>'"""
+    return "Python {}".format(text.replace('_', ' '))
 
 
 if __name__ == '__main__':
