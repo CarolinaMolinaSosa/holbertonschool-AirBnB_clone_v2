@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" State Module for HBNB project """
+""" Updated State Module for HBNB project """
 from os import getenv
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
@@ -17,7 +17,7 @@ class State(BaseModel, Base):
     else:
         @ property
         def cities(self):
-            """Return all cities linked to this relationship."""
+            """update state"""
             from models import storage
             my_list = []
             for i in list(storage.all(City).values()):
