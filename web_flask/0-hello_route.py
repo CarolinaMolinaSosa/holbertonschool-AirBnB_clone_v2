@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route('/', strict_slashes=False)
 def say_hello():
-    """Display “Hello HBNB!” on /."""
+    """Display ""Hello HBNB" on /."""
     return "Hello HBNB!"
 
 
