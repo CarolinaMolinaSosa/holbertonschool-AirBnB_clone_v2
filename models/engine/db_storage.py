@@ -34,17 +34,19 @@ class DBStorage:
         from console import HBNBCommand
 
         info = {}
+
         if cls in HBNBCommand.classes.values():
             result = self.__session.query(cls).all()
             for x in result:
-                info[f"{cls}.{x.id}"] = x.to_dict()
+                info[f"{cls}.{x.id}"] = x
         else:
             for table in HBNBCommand.classes.values():
                 if table.__name__ != 'BaseModel':
                     result = self.__session.query(table).all()
                     for x in result:
                         string = f"{table.__class__.__name__}.{x.id}"
-                        info[string] = x.to_dict()
+                        info[string] = x
+
         return info
 
     def new(self, obj):
