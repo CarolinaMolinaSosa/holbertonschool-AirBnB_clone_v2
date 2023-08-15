@@ -6,6 +6,7 @@ from models import State
 from models import storage
 
 app = Flask(__name__)
+storage.reload()
 
 
 @app.teardown_appcontext
