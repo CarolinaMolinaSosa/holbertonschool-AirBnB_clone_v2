@@ -5,13 +5,13 @@ from flask import Flask, render_template
 app = Flask(__name__)
 
 
-@app.route('/cities_by_states', strict_slashes=False)
-def cities_by_states():
+@app.route('/states_list', strict_slashes=False)
+def states_list():
     from models import storage
     from models.state import State
     states = storage.all(State)
-
-    return render_template('8-cities_by_states.html', states=states)
+    sorted_states = sorted(states.values(), key=lambda state: state.name)
+    return render_template('7-states_list.html', states=sorted_states)
 
 
 @app.teardown_appcontext
