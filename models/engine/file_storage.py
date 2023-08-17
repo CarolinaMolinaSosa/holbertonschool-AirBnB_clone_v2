@@ -11,12 +11,14 @@ class FileStorage:
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
         if cls:
-            objs = {}
-            for key, value in FileStorage.__objects.items():
-                if key.split(".")[0] == cls.__name__:
-                    objs[key] = value
-            return objs
-        return FileStorage.__objects
+            my_dict = {}
+            for k, v in FileStorage.__objects.items():
+                spt = k.split('.')
+                if spt[0] in str(cls):
+                    my_dict[k] = v
+            return my_dict
+        else:
+            return FileStorage.__objects
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -42,10 +44,10 @@ class FileStorage:
         from models.review import Review
 
         classes = {
-                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
-                    'State': State, 'City': City, 'Amenity': Amenity,
-                    'Review': Review
-                  }
+            'BaseModel': BaseModel, 'User': User, 'Place': Place,
+            'State': State, 'City': City, 'Amenity': Amenity,
+            'Review': Review
+        }
         try:
             temp = {}
             with open(FileStorage.__file_path, 'r') as f:
@@ -56,9 +58,13 @@ class FileStorage:
             pass
 
     def delete(self, obj=None):
-        """Deletes an object"""
-        if obj:
-            key = f"{obj.__class__.__name__}.{obj.id}"
-            if key in FileStorage.__objects:
-                del FileStorage.__objects[key]
-                self.save()
+        """delete objects from thee dictionary"""
+        if obj is None:
+            return
+        else:
+            key = "{}.{}".format(type(obj).__name__, obj.id)
+            del FileStorage.__objects[key]
+
+    def close(self):
+        """def close method"""
+        return self.reload()
